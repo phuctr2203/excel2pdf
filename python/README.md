@@ -3,9 +3,13 @@
 Convert Excel workbooks (`.xlsx`, `.xlsm`) to PDF in pure Python. No Excel, no
 LibreOffice, no native binaries: `pip install` and import. MIT licensed.
 
+Not on PyPI yet. Install from GitHub (needs Python 3.9+ and Git):
+
 ```bash
-pip install excel2pdf
+pip install "git+https://github.com/phuctr2203/excel2pdf.git#subdirectory=python"
 ```
+
+To pin a specific commit, add `@<commit>` after `.git`.
 
 ```python
 import excel2pdf
