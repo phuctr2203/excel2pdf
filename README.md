@@ -4,12 +4,23 @@ MIT-licensed libraries that convert Excel workbooks to PDF, for Python and .NET.
 
 | Package | Status | Folder |
 |---|---|---|
-| Python (`pip install excel2pdf`) | v0.1.0, working | [python/](python/README.md) |
+| Python | v0.1.0, working (install from GitHub, see below) | [python/](python/README.md) |
 | .NET (`dotnet add package Excel2Pdf`) | planned: port of the Python renderer | `dotnet/` |
 
 Both packages are pure-language: users install the package and import it.
 Nothing else needs to be installed. An optional *capture* engine can hand the
 workbook to Microsoft Excel or LibreOffice when one is already installed.
+
+## Install (Python)
+
+The package is not on PyPI yet, so install it straight from this repository
+(needs Python 3.9+ and Git):
+
+```bash
+pip install "git+https://github.com/phuctr2203/excel2pdf.git#subdirectory=python"
+```
+
+Once it is published on PyPI this will become `pip install excel2pdf`.
 
 ## Example
 
