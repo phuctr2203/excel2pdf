@@ -8,6 +8,7 @@ points. Everything is drawn with plain vector primitives.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -234,7 +235,8 @@ class ChartRenderer:
             t = chart.title
             st = t.style.merged(self.base)
             runs = []
-            default_size = (st.size or 10.0) * 1.4 if chart.has_text_props else 18.0
+            # Excel draws an unstyled title bold at the chart text size
+            default_size = (st.size or 10.0) * 1.4 if chart.has_text_props else (self.base.size or 10.0)
             title_spec = self.spec(t.style.merged(TextStyle(font=self.base.font, color=self.base.color)),
                                    default_size, bold=True if t.style.bold is None else bool(t.style.bold))
             for text, rst in t.runs:
@@ -487,7 +489,7 @@ class ChartRenderer:
                 sample = format_value(max(abs(lo_d), abs(hi_d)), fmt).text
                 per = self.text.measure([(sample + "00", spec)]) + spec.size
             else:
-                per = spec.size * 3.2
+                per = spec.size * 2.0
             intervals = max(1.0, length / max(per, 1.0))
             span = (hi_d - lo_d)
             if fixed_hi is None:
@@ -781,7 +783,7 @@ class ChartRenderer:
         for grid, minor in ((ax.minor_grid, True), (ax.major_grid, False)):
             if grid is None:
                 continue
-            line = self._line_of(grid, GRID_GRAY if not minor else hex_to_rgb("F2F2F2"), 0.75)
+            line = self._line_of(grid, AXIS_GRAY if not minor else GRID_GRAY, 0.75)
             if line is None:
                 continue
             self._set_line(*line)
@@ -1263,8 +1265,9 @@ class ChartRenderer:
         if total <= 0:
             return
         angle = g.first_slice_angle  # clockwise from 12 o'clock
+        pcts = _pie_percents(values, total, dl.num_fmt if dl else None)
         hole = g.hole_size / 100.0 if g.type == "doughnut" else 0.0
-        default_line = WHITE if not s.props.specified else None
+        default_line = None
         jobs = []
         for i, v in enumerate(values):
             sweep = 360.0 * v / total
@@ -1297,7 +1300,7 @@ class ChartRenderer:
                     self._set_line(*line)
                 c.drawPath(p, stroke=1 if line else 0, fill=1 if fill else 0)
             if dl is not None and v > 0:
-                text = self._label_text(dl, s, i, s.values[i], v / total)
+                text = self._label_text(dl, s, i, s.values[i], pcts[i])
                 if text:
                     lines = self._lines(text, spec)
                     lw, lh = self._block_size(lines)
@@ -1384,6 +1387,22 @@ class ChartRenderer:
                         c.drawPath(p, stroke=1, fill=0)
                         c.setDash([], 0)
                     self._markers_for(g, s, [(x, y) for x, y in pts])
+
+
+def _pie_percents(values: List[float], total: float, fmt: Optional[str]) -> List[float]:
+    """Slice shares, rounded like Excel's labels: the last visible slice takes the remainder
+    so the displayed percentages add up to 100%."""
+    if total <= 0:
+        return [0.0 for _ in values]
+    m = re.search(r"\.(0+)%", fmt or "")
+    decimals = len(m.group(1)) if m else 0
+    unit = 10 ** -(decimals + 2)
+    shares = [v / total for v in values]
+    rounded = [round(round(x / unit) * unit, decimals + 4) for x in shares]
+    last = max((i for i, v in enumerate(values) if v > 0), default=None)
+    if last is not None:
+        rounded[last] = round(1.0 - sum(r for i, r in enumerate(rounded) if i != last), decimals + 4)
+    return rounded
 
 
 def _at(values: Sequence[Optional[float]], i: int) -> Optional[float]:
