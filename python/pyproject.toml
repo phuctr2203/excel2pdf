@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "excel2pdf"
+version = "0.1.0"
+description = "Convert Excel workbooks (.xlsx/.xlsm) to PDF in pure Python: cells, formatting, images and charts."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+authors = [{ name = "The excel2pdf contributors" }]
+keywords = ["excel", "xlsx", "pdf", "convert", "spreadsheet", "openpyxl", "reportlab"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business :: Financial :: Spreadsheet",
+    "Topic :: Printing",
+]
+# Every dependency is under a permissive license compatible with MIT:
+# openpyxl (MIT), reportlab (BSD), Pillow (MIT-CMU), fonttools (MIT).
+dependencies = [
+    "openpyxl>=3.1",
+    "reportlab>=4.0",
+    "pillow>=9.0",
+    "fonttools>=4.40",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "pypdf>=4"]
+
+[project.scripts]
+excel2pdf = "excel2pdf.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/excel2pdf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

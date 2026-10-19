@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+
+# local conversion output
+out/
+
+# .NET (planned)
+bin/
+obj/
+*.user
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
