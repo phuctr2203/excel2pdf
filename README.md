@@ -1,15 +1,12 @@
 # excel2pdf
 
-MIT-licensed libraries that convert Excel workbooks to PDF, for Python and .NET.
+An MIT-licensed Python library that converts Excel workbooks (`.xlsx`, `.xlsm`)
+to PDF: cells, formatting, images and charts.
 
-| Package | Status | Folder |
-|---|---|---|
-| Python | v0.1.0, working (install from GitHub, see below) | [python/](python/README.md) |
-| .NET (`dotnet add package Excel2Pdf`) | planned: port of the Python renderer | `dotnet/` |
-
-Both packages are pure-language: users install the package and import it.
-Nothing else needs to be installed. An optional *capture* engine can hand the
-workbook to Microsoft Excel or LibreOffice when one is already installed.
+Version 0.1.0. The package lives in [python/](python/README.md). It is pure
+Python: install it and import it, nothing else is needed. An optional *capture*
+engine can hand the workbook to Microsoft Excel or LibreOffice when one is
+already installed.
 
 ## Install (Python)
 
