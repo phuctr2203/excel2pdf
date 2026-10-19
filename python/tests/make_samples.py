@@ -264,8 +264,8 @@ def charts_workbook(path: Path) -> None:
     pie = PieChart()
     pie.add_data(Reference(ws, min_col=2, min_row=1, max_row=7), titles_from_data=True)
     pie.set_categories(cats)
-    pie.dataLabels = DataLabelList()
-    pie.dataLabels.showPercent = True
+    pie.dataLabels = DataLabelList(showPercent=True, showVal=False, showCatName=False,
+                                   showSerName=False, showLegendKey=False)
     place(pie, "F31", "Pie (North)")
 
     dough = DoughnutChart()
@@ -308,8 +308,8 @@ def charts_workbook(path: Path) -> None:
     combo = BarChart()
     combo.add_data(Reference(ws, min_col=2, min_row=1, max_row=7), titles_from_data=True)
     combo.set_categories(cats)
-    combo.dataLabels = DataLabelList()
-    combo.dataLabels.showVal = True
+    combo.dataLabels = DataLabelList(showVal=True, showPercent=False, showCatName=False,
+                                     showSerName=False, showLegendKey=False)
     ln = LineChart()
     ln.add_data(Reference(ws, min_col=4, min_row=1, max_row=7), titles_from_data=True)
     ln.y_axis.axId = 200
@@ -326,9 +326,98 @@ def charts_workbook(path: Path) -> None:
     wb.save(path)
 
 
+def example_workbook(path: Path) -> None:
+    """The small report shown in the README: a formatted table plus two charts."""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Sales 2026"
+    ws.sheet_view.showGridLines = True
+    widths = {"A": 14, "B": 12, "C": 12, "D": 12, "E": 12, "F": 13}
+    for col, w in widths.items():
+        ws.column_dimensions[col].width = w
+
+    ws["A1"] = "Sales Report 2026"
+    ws["A1"].font = Font(size=20, bold=True, color="1F4E79")
+    ws["A2"] = "Revenue by region and quarter (USD)"
+    ws["A2"].font = Font(italic=True, color="595959")
+
+    header = ["Region", "Q1", "Q2", "Q3", "Q4", "Total"]
+    thin = Side(style="thin", color="BFBFBF")
+    for i, h in enumerate(header, start=1):
+        c = ws.cell(row=4, column=i, value=h)
+        c.font = Font(bold=True, color="FFFFFF")
+        c.fill = PatternFill("solid", fgColor="1F4E79")
+        c.alignment = Alignment(horizontal="center", vertical="center")
+        c.border = Border(left=thin, right=thin, top=thin, bottom=thin)
+    ws.row_dimensions[4].height = 20
+    data = [
+        ("North", 42150, 45800, 51200, 58900),
+        ("South", 38400, 36100, 40750, 44300),
+        ("East", 29800, 33500, 35900, 41200),
+        ("West", 25600, 27900, 31400, 36800),
+    ]
+    for r, (region, *qs) in enumerate(data, start=5):
+        ws.cell(row=r, column=1, value=region)
+        for k, q in enumerate(qs, start=2):
+            ws.cell(row=r, column=k, value=q)
+        ws.cell(row=r, column=6, value=sum(qs)).font = Font(bold=True)
+        for k in range(1, 7):
+            cell = ws.cell(row=r, column=k)
+            cell.border = Border(left=thin, right=thin, top=thin, bottom=thin)
+            if k > 1:
+                cell.number_format = "$#,##0"
+            if r % 2 == 0:
+                cell.fill = PatternFill("solid", fgColor="DDEBF7")
+    total_row = 9
+    ws.cell(row=total_row, column=1, value="Total").font = Font(bold=True)
+    for k in range(2, 7):
+        col_sum = sum(ws.cell(row=r, column=k).value for r in range(5, 9))
+        c = ws.cell(row=total_row, column=k, value=col_sum)
+        c.number_format = "$#,##0"
+        c.font = Font(bold=True)
+    for k in range(1, 7):
+        ws.cell(row=total_row, column=k).border = Border(top=Side(style="thin"), bottom=Side(style="double"))
+    ws["A11"] = "Growth Q1 → Q4"
+    ws["A11"].font = Font(bold=True)
+    for r, (region, *qs) in enumerate(data, start=12):
+        ws.cell(row=r, column=1, value=region)
+        g = ws.cell(row=r, column=2, value=qs[-1] / qs[0] - 1)
+        g.number_format = "0.0%"
+    ws.conditional_formatting.add("B12:B15", DataBarRule(start_type="num", start_value=0, end_type="max", color="70AD47"))
+
+    bar = BarChart()
+    bar.title = "Revenue by quarter"
+    bar.add_data(Reference(ws, min_col=2, min_row=4, max_col=5, max_row=8), titles_from_data=True, from_rows=False)
+    bar.set_categories(Reference(ws, min_col=1, min_row=5, max_row=8))
+    bar.y_axis.numFmt = "$#,##0"
+    bar.y_axis.majorGridlines = bar.y_axis.majorGridlines
+    bar.x_axis.delete = False
+    bar.y_axis.delete = False
+    bar.width, bar.height = 15, 7.5
+    bar.legend.position = "b"
+    ws.add_chart(bar, "H1")
+
+    pie = PieChart()
+    pie.title = "Share of annual revenue"
+    pie.add_data(Reference(ws, min_col=6, min_row=4, max_row=8), titles_from_data=True)
+    pie.set_categories(Reference(ws, min_col=1, min_row=5, max_row=8))
+    pie.dataLabels = DataLabelList(showPercent=True, showVal=False, showCatName=False,
+                                   showSerName=False, showLegendKey=False)
+    pie.width, pie.height = 15, 7.5
+    ws.add_chart(pie, "H17")
+
+    ws.page_setup.orientation = "landscape"
+    ws.sheet_properties.pageSetUpPr = PageSetupProperties(fitToPage=True)
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 1
+    ws.oddFooter.center.text = "Page &P of &N"
+    wb.save(path)
+
+
 def main() -> None:
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[2] / "samples"
     out.mkdir(parents=True, exist_ok=True)
+    example_workbook(out / "sales-report.xlsx")
     formatting_workbook(out / "formatting.xlsx")
     charts_workbook(out / "charts.xlsx")
     print(f"samples written to {out}")

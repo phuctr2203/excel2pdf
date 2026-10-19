@@ -22,6 +22,16 @@ excel2pdf.convert("report.xlsx", "report.pdf", paper_size="A4", orientation="lan
 excel2pdf.convert("report.xlsx", "summary.pdf", sheets=["Summary", 2])
 ```
 
+### Example: Excel vs. PDF
+
+| The workbook in Microsoft Excel | The PDF written by excel2pdf |
+|---|---|
+| ![sales-report.xlsx open in Microsoft Excel](https://raw.githubusercontent.com/phuctr2203/excel2pdf/main/docs/images/excel.png) | ![PDF page produced by excel2pdf](https://raw.githubusercontent.com/phuctr2203/excel2pdf/main/docs/images/pdf.png) |
+
+Made with `excel2pdf.convert("sales-report.xlsx", "sales-report.pdf")` from
+[samples/sales-report.xlsx](https://github.com/phuctr2203/excel2pdf/blob/main/samples/sales-report.xlsx)
+([PDF](https://github.com/phuctr2203/excel2pdf/blob/main/docs/sales-report.pdf)).
+
 Command line:
 
 ```bash

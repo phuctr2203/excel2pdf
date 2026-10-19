@@ -349,11 +349,12 @@ class ChartReader:
         return s
 
     def _labels(self, el: ET.Element) -> DataLabels:
+        # Excel treats show* flags that are left out of <c:dLbls> as switched on.
         dl = DataLabels(
-            show_val=_bool(el, "showVal", False),
-            show_pct=_bool(el, "showPercent", False),
-            show_cat=_bool(el, "showCatName", False),
-            show_ser=_bool(el, "showSerName", False),
+            show_val=_bool(el, "showVal", True),
+            show_pct=_bool(el, "showPercent", True),
+            show_cat=_bool(el, "showCatName", True),
+            show_ser=_bool(el, "showSerName", True),
             position=_val(el, "dLblPos", None),
         )
         if _bool(el, "delete", False):
@@ -362,7 +363,7 @@ class ChartReader:
         if nf is not None:
             dl.num_fmt = nf.get("formatCode")
         sep = el.find(C + "separator")
-        if sep is not None and sep.text:
+        if sep is not None and sep.text is not None:
             dl.separator = sep.text
         dl.style = self.text_props(el.find(C + "txPr"))
         return dl

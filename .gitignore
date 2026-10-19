@@ -20,3 +20,6 @@ obj/
 .DS_Store
 .idea/
 .vscode/
+
+# Office lock files
+~$*
