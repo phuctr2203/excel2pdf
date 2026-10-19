@@ -35,6 +35,8 @@ excel2pdf.convert("report.xlsx", "summary.pdf", sheets=["Summary", 2])
 Made with `excel2pdf.convert("sales-report.xlsx", "sales-report.pdf")` from
 [samples/sales-report.xlsx](https://github.com/phuctr2203/excel2pdf/blob/main/samples/sales-report.xlsx)
 ([PDF](https://github.com/phuctr2203/excel2pdf/blob/main/docs/sales-report.pdf)).
+More results (all chart types, formatting) are in the
+[project README](https://github.com/phuctr2203/excel2pdf#results).
 
 Command line:
 
