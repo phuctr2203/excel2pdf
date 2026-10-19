@@ -11,11 +11,6 @@ build/
 # local conversion output
 out/
 
-# .NET (planned)
-bin/
-obj/
-*.user
-
 # OS / editors
 .DS_Store
 .idea/
